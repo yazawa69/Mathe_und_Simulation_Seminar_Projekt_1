@@ -3,6 +3,7 @@ package app;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.sql.Time;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -11,6 +12,11 @@ import javax.swing.JPanel;
 import utils.ApplicationTime;
 
 public class _6_YourOwnAnimation extends Animation {
+	
+	public static double x1 = 400;
+	public static double x2 = 600;
+	public static double sppX = 1;
+
 
 	@Override
 	protected ArrayList<JFrame> createFrames(ApplicationTime applicationTimeThread) {
@@ -24,8 +30,17 @@ public class _6_YourOwnAnimation extends Animation {
 		frame.add(panel);
 		frame.pack(); // adjusts size of the JFrame to fit the size of it's components
 		frame.setVisible(true);
+
+		//Create SecondaryFrame
+		 JFrame secondaryFrame = new JFrame("Position");
+		 secondaryFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		 JPanel secondaryPanel = new SecondaryGraphicsContent();
+		 secondaryFrame.add(secondaryPanel);
+		 secondaryFrame.pack(); // adjusts size of the JFrame to fit the size of it's components
+		 secondaryFrame.setVisible(true);
 		
 		frames.add(frame);
+		frames.add(secondaryFrame);
 		return frames;
 	}
 
@@ -46,118 +61,107 @@ class _6_YourOwnAnimationPanel extends JPanel {
 	public Dimension getPreferredSize() {
 		return new Dimension(_0_Constants.WINDOW_WIDTH, _0_Constants.WINDOW_HEIGHT);
 	}
-
+	
 	int width = _0_Constants.WINDOW_WIDTH;
 	int height = _0_Constants.WINDOW_HEIGHT;
-	double startX = 20;
-	double startY = 20;
-	double vX = 160;
-	double vY = 1;
-	double gravity = 9.81;
-	double friction = 1;
-	double currentX = startX;
-	double currentY = startY;
-	int diameter = 50;
+
+
+
+	//Erste Masse
+	double mass1 = 5;
+	double x1_start = _6_YourOwnAnimation.x1;
+	double v1 = 10;
+	double v1_start = v1;
+	
+	//Zweite Masse
+	double mass2 = 5;
+	double x2_start = _6_YourOwnAnimation.x2;	
+	double v2 = -10;
+	double v2_start = v2;
+	
+	//Gleichgewichtsabstand l0
+	double l0 = 200;
+	
+	//Schwerpunktposition X(t)
+	double masseinvers = 1;
+	
+	//Effektiver Abstand s(t)
+	final double d = 1;
+	double a = 1;
+	double b = 1;
+	double u = 1;
+	double s = 1;
+	
+	//Zeit
 	double collisionTime = time;
 	double deltaTime = 0.0; 
 	double lastFrameTime = 0.0;
 
+
 	// drawing operations should be done in this method
 	@Override
 	protected void paintComponent(Graphics g) {
-
+		
 		super.paintComponent(g);
 		time = t.getTimeInSeconds();
-		
-		g.setColor(Color.LIGHT_GRAY);
-		g.fillRect(0, 0, _0_Constants.WINDOW_WIDTH, _0_Constants.WINDOW_HEIGHT);
-		
-		if(currentX >= width - diameter) {
-			vX = -vX;
-		}
-		else if (currentX <= 0) {
-			vX = -vX;
-		}
-		
-		if(currentY >= height - diameter) {
-			vY = -vY;
-			if (vY>0 && vY<2.1)
-				vY = 0;
-		}
-		else if (currentY <= 0)
-			vY = -vY;
-		
+
 		deltaTime = time - lastFrameTime; 
 		lastFrameTime = time;
-		vY += gravity;
-		currentX = currentX + (vX * deltaTime);
-		currentY = currentY + (vY * deltaTime);
 		
-		if(vY > 0)
-			vY -= friction;
-		if(vY < 0) {
-			vY += friction;
-		}
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(0, 0, width, height);
 		
-		g.setColor(Color.RED);
-		g.fillOval((int) currentX, (int) currentY, diameter, diameter);
+		//Schwerpunktposition
+		masseinvers = (1/(mass1 + mass2));
+		_6_YourOwnAnimation.sppX = masseinvers * (mass1*x1_start + mass2*x2_start) + masseinvers * (mass1*v1_start + mass2*v2_start) * time;
 		
-		/**
-		 * Exercises:
-		 * 
-		 * 1) Use the same initial conditions ( startX, startY, vX, vY ) as above. Let
-		 * the circle/ball "bounce off the vertical walls", i.e. provide for correct
-		 * changes of velocity whenever the circle/ball "collides elastically with" the
-		 * right-hand or the left-hand frame borders.
-		 * 
-		 * Hints: (i) As soon as the condition if( currentX >= width) yields "TRUE", do
-		 * the following - reverse vX: vX = -vX; - assign the value "width" to the
-		 * variable "startX"; - assign the value "time" to a new variable
-		 * "collisionTime", that you have to add to the code. (ii) Replace the code line
-		 * "currentX = startX + time * vX;" by "currentX = startX + (time -
-		 * collisionTime) * vX;"
-		 * 
-		 * Improve the application by ensuring that the ball does not penetrate into the
-		 * right-hand wall.
-		 * 
-		 * 2) Choose any initial conditions (startX, startY, vX, vY ). Let the
-		 * circle/ball "bounce off the walls", i.e. provide for correct changes of
-		 * velocity whenever the circle/ball "collides elastically with" any of the four
-		 * frame borders.
-		 * 
-		 * (i) As an alternative to the techniques employed in Exercise 1), use now what
-		 * we may call the "deltaTime paradigm":
-		 * 
-		 * double deltaTime = 0.0; double lastFrameTime = 0.0;
-		 * 
-		 * deltaTime = time - lastFrameTime; lastFrameTime = time; currentX = currentX +
-		 * (vX * deltaTime); currentY = currentY + (vY * deltaTime);
-		 * 
-		 * if (currentX >= _0_Constants.WINDOW_WIDTH - diameter) {
-		 * System.out.println("Object has hit the right-hand wall."); vX = -vX; currentX
-		 * = currentX - 1; // One pixel is subtracted from to the current x-coordinate
-		 * if the ball is at // the right-hand boundary. This prevents the ball from
-		 * "sticking to the border" after a collision
-		 * 
-		 * (ii) Note the following ways of formatting numerical output:
-		 *
-		 * System.out.println("vX = " + (double) Math.round(100 * vX) / 100);
-		 * System.out.println("currentX = " + (double) Math.round(100 * currentX) /
-		 * 100); System.out.println("currentY = " + (double) Math.round(100 * currentY)
-		 * / 100 + '\n');
-		 * 
-		 * 
-		 * 3) Simulate the motion of the ball/circle under the influence of gravity
-		 * Place the circle a some height h above the floor (bottom frame border) with
-		 * initial velocity vY = 0. Let the circle/ball undergo accelerated motion
-		 * toward the bottom. Once the ball hits the floor, its velocity is reversed
-		 * (fully elastic collision), the ensuing upward motion is decelerated until the
-		 * circle/ball comes to rest a height h, etc. * 4) As in Exercise 3) except that
-		 * there shall now be a loss of kinetic energy each time the ball hits the
-		 * botton.
-		 * 
-		 * 
-		 */
+		//Effektive Abstand
+		u = (mass1 * mass2) / (mass1 + mass2);
+		a = _6_YourOwnAnimation.x2 - _6_YourOwnAnimation.x1 - l0;
+		b = Math.sqrt(u/d) * (v2 - v1);
+		double ergebnisInKlammer = Math.sqrt(d/u) * time;
+		s = a * Math.cos(ergebnisInKlammer) + b * Math.sin(ergebnisInKlammer);
+		
+		// Position der beiden Massen
+		_6_YourOwnAnimation.x1 = _6_YourOwnAnimation.sppX - (mass2/(mass1 + mass2)) * (s + l0);
+		_6_YourOwnAnimation.x2 = _6_YourOwnAnimation.sppX + (mass1/(mass1 + mass2)) * (s + l0);
+		
+		
+		
+		System.out.println("Masse 1: " + mass1 + ", Masse 2: " + mass2);
+		System.out.println("x 1: " + _6_YourOwnAnimation.x1 + ", x 2: " + _6_YourOwnAnimation.x2);
+		System.out.println("x start 1: " + x1_start + ", x start 2: " + x2_start);
+		System.out.println("v 1: " + v1 + ", v 2: " + v2);
+		System.out.println("v start 1: " + v1_start + ", v start 2: " + v2_start);
+		
+		System.out.println("Gleichgewichtsabstand: " + l0);
+		System.out.println("Schwerpunktposition: " + _6_YourOwnAnimation.sppX);
+		System.out.println("effektiver abstand: " + s);
 
+		System.out.println("a: " + a + " , b: " + b + " ,u: " + u + " ,ergebnisKlammmer: " + ergebnisInKlammer);
+
+		g.setColor(Color.black);
+		g.fillRect((int)_6_YourOwnAnimation.x1, 200, 50, 50);
+		g.fillRect((int)_6_YourOwnAnimation.x2, 200, 50, 50);
+	}
+}
+
+@SuppressWarnings("serial")
+class SecondaryGraphicsContent extends JPanel {
+	// set this panel's preferred size for auto-sizing the container JFrame
+	public Dimension getPreferredSize() {
+		return new Dimension(300, 100);
+	}
+
+	// drawing operations should be done in this method
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		double masseschwerpunkt_M1 = _6_YourOwnAnimation.x1 + 25;
+		double masseschwerpunkt_M2 = _6_YourOwnAnimation.x2 + 25;
+		g.drawString("Massenmittelpunkt von Masse 1: x: " + (int)masseschwerpunkt_M1 + "  y: " + 225, 10, 20);
+		g.drawString("Massenmittelpunkt von Masse 2: x: " + (int)masseschwerpunkt_M2 + "  y: " + 225, 10, 35);
+		g.drawString("Schwerpunktposition: " + _6_YourOwnAnimation.sppX, 10, 50);
+		g.setColor(Color.LIGHT_GRAY);
 	}
 }
