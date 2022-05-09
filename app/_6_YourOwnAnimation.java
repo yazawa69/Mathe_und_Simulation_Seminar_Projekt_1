@@ -15,14 +15,7 @@ import org.w3c.dom.events.Event;
 import utils.ApplicationTime;
 
 public class _6_YourOwnAnimation extends Animation {
-	
-	public static double x1 = 300;
-	public static double x2 = 600;
-	public static double v1 = 10;
-	public static double mass1 = 5;
-	public static double sppX = 1;
-
-
+	public double addedTime = 0;
 	@Override
 	protected ArrayList<JFrame> createFrames(ApplicationTime applicationTimeThread) {
 		ArrayList<JFrame> frames = new ArrayList<JFrame>();
@@ -46,54 +39,69 @@ public class _6_YourOwnAnimation extends Animation {
 
 		 // Textfeld wird erstellt
 		 // Text und Spaltenanzahl werden dabei direkt gesetzt
-		JLabel label = new JLabel("Masse 1:");
-        panel.add(label);
-        JTextField tfName = new JTextField("0", 5);
-        panel.add(tfName);
+		JLabel mass1l = new JLabel("Masse 1:");
+        panel.add(mass1l);
+        JTextField mass1tf = new JTextField("5", 5);
+        panel.add(mass1tf);
 
-		JLabel labelv = new JLabel("velocity 1:");
-        panel.add(labelv);
-        JTextField tfv1 = new JTextField("0", 5);
+		JLabel x1sl = new JLabel("Startwert 1:");
+        panel.add(x1sl);
+        JTextField x1stf = new JTextField("300", 5);
+        panel.add(x1stf);
+
+		JLabel v1l = new JLabel("velocity 1:");
+        panel.add(v1l);
+        JTextField tfv1 = new JTextField("30", 5);
         panel.add(tfv1);
 
-		JLabel label2 = new JLabel("Masse 2:");
-        panel.add(label2);
-		JTextField tfName2 = new JTextField("0", 5);
-		panel.add(tfName2);
+		JLabel mass2l = new JLabel("Masse 2:");
+        panel.add(mass2l);
+		JTextField tfmass2 = new JTextField("5", 5);
+		panel.add(tfmass2);
+
+		JLabel x2sl = new JLabel("Startwert 2:");
+        panel.add(x2sl);
+		JTextField tfx2s = new JTextField("600", 5);
+		panel.add(tfx2s);
 
 		JLabel labelv2 = new JLabel("velocity 2:");
         panel.add(labelv2);
-        JTextField tfv2 = new JTextField("0", 5);
+        JTextField tfv2 = new JTextField("-30", 5);
         panel.add(tfv2);
 		
-		JLabel label3 = new JLabel("Federhärte:");
-        panel.add(label3);
-		JTextField tfName3 = new JTextField("0", 5);
-		panel.add(tfName3);
+		JLabel dl = new JLabel("Federhärte:");
+        panel.add(dl);
+		JTextField tfd = new JTextField("1", 5);
+		panel.add(tfd);
 
-		JLabel label4 = new JLabel("Gleichgewichtsabstand:");
-        panel.add(label4);
-		JTextField tfName4 = new JTextField("0", 5);
-        // Textfeld wird unserem Panel hinzugefügt
-		panel.add(tfName4);
- 
+		JLabel l0l = new JLabel("Gleichgewichtsabstand:");
+        panel.add(l0l);
+		JTextField tfl0 = new JTextField("200", 5);
+		panel.add(tfl0);
+		
         JButton buttonOK = new JButton("OK");
 		buttonOK.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				_6_YourOwnAnimation.mass1 = Integer.parseInt(tfName.getText());
-				_6_YourOwnAnimation.v1 = Integer.parseInt(tfv1.getText());
-				System.out.println(_6_YourOwnAnimation.v1);
+				addedTime += _6_YourOwnAnimationPanel.time;
+				_6_YourOwnAnimationPanel.resetTime = addedTime;
+
+				_6_YourOwnAnimationPanel.x1_start = Double.parseDouble(x1stf.getText());
+				_6_YourOwnAnimationPanel.mass1 = Double.parseDouble(mass1tf.getText());
+				_6_YourOwnAnimationPanel.v1 = Double.parseDouble(tfv1.getText());
+
+				_6_YourOwnAnimationPanel.x2_start = Double.parseDouble(tfx2s.getText());
+				_6_YourOwnAnimationPanel.mass2 = Double.parseDouble(tfmass2.getText());
+				_6_YourOwnAnimationPanel.v2 = Double.parseDouble(tfv2.getText());
+
+				_6_YourOwnAnimationPanel.d = Double.parseDouble(tfd.getText());
+				_6_YourOwnAnimationPanel.l0 = Double.parseDouble(tfl0.getText());
 			}
 		});
         panel.add(buttonOK);
 		
-		
-
 		frame.setVisible(true);
-
-		
 		frames.add(frame);
 		frames.add(secondaryFrame);
 		return frames;
@@ -106,7 +114,8 @@ class _6_YourOwnAnimationPanel extends JPanel {
 
 	// panel has a single time tracking thread associated with it
 	private ApplicationTime t;
-	private double time;
+	public static double time;
+	public static double resetTime;
 
 	public _6_YourOwnAnimationPanel(ApplicationTime thread) {
 		this.t = thread;
@@ -123,86 +132,92 @@ class _6_YourOwnAnimationPanel extends JPanel {
 
 
 	//Erste Masse
-	double mass1 = _6_YourOwnAnimation.mass1;
-	double x1_start = _6_YourOwnAnimation.x1;
-	double x1t;
-	double v1 = _6_YourOwnAnimation.v1;
+	public static double mass1 = 5;
+	public static double x1_start = 300;
+	public static double x1t;
+	public static double v1 = 30;
 	
 	//Zweite Masse
-	double mass2 = 5;
-	double x2_start =  600;//_6_YourOwnAnimation.x2;
-	double x2t;	
-	double v2 = -10;
+	public static double mass2 = 5;
+	public static double x2_start =  600;
+	public static double x2t;	
+	public static double v2 = -30;
 	
 	//Gleichgewichtsabstand l0
-	double l0 = 200;
+	public static double l0 = 200;
 	
 	//Schwerpunktposition X(t)
 	double masseinvers = 1;
-	double sppX = 500;
+	public static double sppX = 500;
+	double sspV = 1;
+	double schwingAmplitude = 1;
+	double schwingT = 1;
+	double schwingT2 = 1;
 	
 	//Effektiver Abstand s(t)
-	final double d = 1;
+	public static double d = 1;
 	double a = 1;
 	double b = 1;
 	double u = 1;
 	double s = 1;
-	
-	//Zeit
-	double collisionTime = time;
-	double deltaTime = 0.0; 
-	double lastFrameTime = 0.0;
-
 
 	// drawing operations should be done in this method
 	@Override
 	protected void paintComponent(Graphics g) {
 
-		mass1 = _6_YourOwnAnimation.mass1;
-		v1 = _6_YourOwnAnimation.v1;
+		Graphics2D g2d;
+		g2d = (Graphics2D) g;
 		
 		super.paintComponent(g);
-		time = t.getTimeInSeconds();
-
-		deltaTime = time - lastFrameTime; 
-		lastFrameTime = time;
+		time = t.getTimeInSeconds() - resetTime;
+		System.out.println(time);
 		
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, width, height);
 		
 		//Schwerpunktposition X(t)
 		masseinvers = (1/(mass1 + mass2));
-		/*_6_YourOwnAnimation.*/sppX = masseinvers * (mass1*x1_start + mass2*x2_start) + masseinvers * (mass1*v1 + mass2*v2) * time;
+		sppX = masseinvers * (mass1*x1_start + mass2*x2_start) + masseinvers * (mass1*v1 + mass2*v2) * time;
 		
 		//Effektive Abstand s(t)
 		u = (mass1 * mass2) / (mass1 + mass2);
 		a = x2_start - x1_start - l0;
 		b = Math.sqrt(u/d) * (v2 - v1);
-		double zwischenErgebnis = Math.sqrt(d/u) * time;// phaseangle
-		s = a * Math.cos(zwischenErgebnis) + b * Math.sin(zwischenErgebnis);
+		double phaseangle = Math.sqrt(d/u) * time;
+		s = a * Math.cos(phaseangle) + b * Math.sin(phaseangle);
 		
 		// Position der beiden Massen
-		/*_6_YourOwnAnimation.*/x1t = /*_6_YourOwnAnimation.*/sppX - (mass2/(mass1 + mass2)) * (s + l0);
-		/*_6_YourOwnAnimation.*/x2t = /*_6_YourOwnAnimation.*/sppX + (mass1/(mass1 + mass2)) * (s + l0);
-		
-		
-		
-		/*System.out.println("Masse 1: " + mass1 + ", Masse 2: " + mass2);
-		System.out.println("x1t: " + x1t + ", x2t: " + x2t);
-		System.out.println("x 1: " + _6_YourOwnAnimation.x1 + ", x 2: " + _6_YourOwnAnimation.x2);
-		System.out.println("x start 1: " + x1_start + ", x start 2: " + x2_start);
-		System.out.println("v 1: " + v1 + ", v 2: " + v2);
-		System.out.println("v start 1: " + v1_start + ", v start 2: " + v2_start);
-		
-		System.out.println("Gleichgewichtsabstand: " + l0);
-		System.out.println("Schwerpunktposition: " + _6_YourOwnAnimation.sppX);
-		System.out.println("effektiver abstand: " + s);
+		x1t = sppX - (mass2/(mass1 + mass2)) * (s + l0);
+		x2t = sppX + (mass1/(mass1 + mass2)) * (s + l0);
 
-		System.out.println("a: " + a + " , b: " + b + " ,u: " + u + " ,ergebnisKlammmer: " + zwischenErgebnis);*/
+		// Validierung
+		sspV = (1/(mass1 + mass2)) * (mass1 * v1 + mass2 * v2);
+		schwingAmplitude = s * Math.sin(Math.sqrt(d/u) * time);
+		schwingT = 2 * Math.PI / d / mass1;
+		schwingT2 = 2 * Math.PI / d / mass2;
 
+		/*System.out.println("Schwerpunktgeschwindigkeit: " + sspV + "\n" +
+							"Schwingungsamplitude: " + schwingAmplitude + "\n" +
+							"Schwingungsperiodendauer von masse1: " + schwingT + "\n" +
+							"Schwingungsperiodendauer von masse2: " + schwingT2 + "\n");
+
+*/
+		// zeichnen
+		g.setColor(Color.red);
+		g.fillRect((int)x1t, 200, 50, 50);
+		g.setColor(Color.blue);
+		g.fillRect((int)x2t, 200, 50, 50);
 		g.setColor(Color.black);
-		g.fillRect((int)/*_6_YourOwnAnimation.*/x1t, 200, 50, 50);
-		g.fillRect((int)/*_6_YourOwnAnimation.*/x2t, 200, 50, 50);
+		g.drawLine((int)x1t + 25, 225, (int)x2t + 25, 225);
+		g.fillOval((int)sppX + 20, 220, 10, 10);
+
+		// Weg Zeit Diagramm
+		g2d.setStroke(new BasicStroke(5.0f));
+		g.drawLine(width - 400, height - 200, width, height - 200);
+		g.drawLine(width - 200, height - 400, width - 200, height);
+		g.setColor(Color.red);
+		
+		g.fillOval(width - 200 + (int)time, height - 200 - (int)x1t/10, 10, 10);
 	}
 }
 
@@ -217,31 +232,11 @@ class SecondaryGraphicsContent extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		double masseschwerpunkt_M1 = _6_YourOwnAnimation.x1 + 25;
-		double masseschwerpunkt_M2 = _6_YourOwnAnimation.x2 + 25;
+		double masseschwerpunkt_M1 = _6_YourOwnAnimationPanel.x1t + 25;
+		double masseschwerpunkt_M2 = _6_YourOwnAnimationPanel.x2t + 25;
 		g.drawString("Massenmittelpunkt von Masse 1: x: " + (int)masseschwerpunkt_M1 + "  y: " + 225, 10, 20);
 		g.drawString("Massenmittelpunkt von Masse 2: x: " + (int)masseschwerpunkt_M2 + "  y: " + 225, 10, 35);
-		g.drawString("Schwerpunktposition: " + _6_YourOwnAnimation.sppX, 10, 50);
+		g.drawString("Schwerpunktposition: " + _6_YourOwnAnimationPanel.sppX, 10, 50);
 		g.setColor(Color.LIGHT_GRAY);
-	}
-}
-
-class ControlButtons implements ActionListener {
-	JButton button;
-	JFrame frame;
-	ApplicationTime applicationTimeThread;
-
-	public ControlButtons(JButton button, JFrame frame, ApplicationTime applicationTimeThread) {
-		this.button = button;
-		this.frame = frame;
-		this.applicationTimeThread = applicationTimeThread;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (button.getText() == "Ok") {
-			applicationTimeThread.pauseTime();
-			System.out.println("Pause pressed");
-		}
 	}
 }
