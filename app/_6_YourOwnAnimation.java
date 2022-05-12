@@ -71,7 +71,7 @@ public class _6_YourOwnAnimation extends Animation {
 		
 		JLabel dl = new JLabel("Federhärte:");
         panel.add(dl);
-		JTextField tfd = new JTextField("1", 5);
+		JTextField tfd = new JTextField("20", 5);
 		panel.add(tfd);
 
 		JLabel l0l = new JLabel("Gleichgewichtsabstand:");
@@ -155,7 +155,7 @@ class _6_YourOwnAnimationPanel extends JPanel {
 	double schwingT2 = 1;
 	
 	//Effektiver Abstand s(t)
-	public static double d = 1;
+	public static double d = 20;
 	double a = 1;
 	double b = 1;
 	double u = 1;
@@ -170,7 +170,7 @@ class _6_YourOwnAnimationPanel extends JPanel {
 		
 		super.paintComponent(g);
 		time = t.getTimeInSeconds() - resetTime;
-		System.out.println(time);
+		System.out.println("Zeitpunkt: " + time);
 		
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, width, height);
@@ -190,34 +190,76 @@ class _6_YourOwnAnimationPanel extends JPanel {
 		x1t = sppX - (mass2/(mass1 + mass2)) * (s + l0);
 		x2t = sppX + (mass1/(mass1 + mass2)) * (s + l0);
 
+		/*if (time >= 3.0 && time <= 3.03){
+			System.out.println(x1t + " " + x2t);
+		}*/
+
 		// Validierung
 		sspV = (1/(mass1 + mass2)) * (mass1 * v1 + mass2 * v2);
 		schwingAmplitude = s * Math.sin(Math.sqrt(d/u) * time);
-		schwingT = 2 * Math.PI / d / mass1;
-		schwingT2 = 2 * Math.PI / d / mass2;
+		schwingT = 2 * Math.PI * Math.sqrt(mass1/d);
+		schwingT2 = 2 * Math.PI * Math.sqrt(mass2/d);
 
-		/*System.out.println("Schwerpunktgeschwindigkeit: " + sspV + "\n" +
+		System.out.println("Schwerpunktgeschwindigkeit: " + sspV + "\n" +
 							"Schwingungsamplitude: " + schwingAmplitude + "\n" +
 							"Schwingungsperiodendauer von masse1: " + schwingT + "\n" +
 							"Schwingungsperiodendauer von masse2: " + schwingT2 + "\n");
 
-*/
 		// zeichnen
 		g.setColor(Color.red);
 		g.fillRect((int)x1t, 200, 50, 50);
 		g.setColor(Color.blue);
 		g.fillRect((int)x2t, 200, 50, 50);
 		g.setColor(Color.black);
-		g.drawLine((int)x1t + 25, 225, (int)x2t + 25, 225);
+		g.drawLine((int)x1t + 50, 225, (int)x2t, 225);
 		g.fillOval((int)sppX + 20, 220, 10, 10);
+		g.fillOval((int)x1t + 20, 220, 10, 10);
+		g.fillOval((int)x2t +20, 220, 10, 10);
+
+		double abbruchbedingung = l0 - Math.sqrt(a*a + b*b);
+		//System.out.println(abbruchbedingung);
+		if (abbruchbedingung < 50){
+			g.setColor(Color.red);
+			g.setFont(new Font("Arial", Font.PLAIN, 50));
+			g.drawString("Nicht Physikalisch korrekte Darstellung,", 100, 100);
+			g.drawString("da eine Kollision,", 100, 200);
+			g.drawString("der beiden Massen stattfindet!!!", 100, 300);
+		}
+
+		g.setColor(Color.blue);
+		g.setFont(new Font("Arial", Font.PLAIN, 20));
+		g.drawString("Zeitpunkt: " + time, 10, height - 125);
+		g.drawString("Schwerpunktgeschwindigkeit: " + sspV, 10, height - 100);
+		g.drawString("Schwingungsamplitude: " + schwingAmplitude, 10, height - 75);
+		g.drawString("Schwingperiode Masse 1: " + schwingT, 10, height - 50);
+		g.drawString("Schwingperiode Masse 2: " + schwingT2, 10, height - 25);
 
 		// Weg Zeit Diagramm
+		g.setColor(Color.black);
+		g.setFont(new Font("Arial", Font.PLAIN, 10));
 		g2d.setStroke(new BasicStroke(5.0f));
-		g.drawLine(width - 400, height - 200, width, height - 200);
-		g.drawLine(width - 200, height - 400, width - 200, height);
+		g.drawLine(width - 400, height - 50, width, height - 50);
+		g.drawLine(width - 200, height - 250, width - 200, height);
+
+		g.drawString("200", width - 225, height - 50 - 20);
+		g.drawString("400", width - 225, height - 50 - 40);
+		g.drawString("600", width - 225, height - 50 - 60);
+		g.drawString("800", width - 225, height - 50 - 80);
+		g.drawString("x", width - 211, height - 50 - 150);
+
+		g.drawString("5", width - 200 + 10, height - 50 + 11);
+		g.drawString("10", width - 200 + 20, height - 50 + 11);
+		g.drawString("20", width - 200 + 40, height - 50 + 11);
+		g.drawString("30", width - 200 + 60, height - 50 + 11);
+		g.drawString("40", width - 200 + 80, height - 50 + 11);
+		g.drawString("50", width - 200 + 100, height - 50 + 11);
+		g.drawString("60", width - 200 + 120, height - 50 + 11);
+		g.drawString("t", width - 200 + 180, height - 50 + 11);
+
 		g.setColor(Color.red);
-		
-		g.fillOval(width - 200 + (int)time, height - 200 - (int)x1t/10, 10, 10);
+		g.fillOval(width - 200 + (int)time*2, height - 50 - (int)x1t/10, 10, 10);
+		g.setColor(Color.blue);
+		g.fillOval(width - 200 + (int)time*2, height - 50 - (int)x2t/10, 10, 10);
 	}
 }
 
