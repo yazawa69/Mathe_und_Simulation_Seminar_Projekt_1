@@ -200,29 +200,6 @@ class _6_YourOwnAnimationPanel extends JPanel {
 		
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, width, height);
-
-		/*// für das Diagramm
-		for (int i=0; i<=400; i++){
-			//Schwerpunktposition X(t)
-			masseinvers = (1/(mass1 + mass2));
-			sppX = masseinvers * (mass1*x1_start + mass2*x2_start) + masseinvers * (mass1*v1 + mass2*v2) * i/32;
-		
-			//Effektive Abstand s(t)
-			u = (mass1 * mass2) / (mass1 + mass2);
-			a = x2_start - x1_start - l0;
-			b = Math.sqrt(u/d) * (v2 - v1);
-			double phaseangle2 = Math.sqrt(d/u) * i/32;
-			s = a * Math.cos(phaseangle2) + b * Math.sin(phaseangle2);
-		
-			// Position der beiden Massen
-			x1t = sppX - (mass2/(mass1 + mass2)) * (s + l0);
-			x2t = sppX + (mass1/(mass1 + mass2)) * (s + l0);
-
-			g.setColor(Color.yellow);
-			g.fillOval(width - 300 + i, height - 50 - (int)(x1t/2.5) + 80, 4, 4);
-			g.setColor(Color.green);
-			g.fillOval(width - 300 + i, height - 50 - (int)(x2t/2.5) + 80, 4, 4);
-		}*/
 		
 		//Schwerpunktposition X(t)
 		masseinvers = (1/(mass1 + mass2));
@@ -239,10 +216,6 @@ class _6_YourOwnAnimationPanel extends JPanel {
 		x1t = sppX - (mass2/(mass1 + mass2)) * (s + l0);
 		x2t = sppX + (mass1/(mass1 + mass2)) * (s + l0);
 
-		/*if (time >= 3.0 && time <= 3.03){
-			System.out.println(x1t + " " + x2t);
-		}*/
-
 		// Validierung
 		sspV = (1/(mass1 + mass2)) * (mass1 * v1 + mass2 * v2);
 		schwingAmplitude = Math.sqrt(a*a + b*b);
@@ -253,8 +226,16 @@ class _6_YourOwnAnimationPanel extends JPanel {
 							"Schwingungsamplitude: " + schwingAmplitude + "\n" +
 							"Schwingungsperiodendauer von masse1: " + schwingT + "\n" +
 							"Schwingungsperiodendauer von masse2: " + schwingT2 + "\n");
+		// Validierungswerte werden auf den Bildschirm gezeichnet
+		g.setColor(Color.blue);
+		g.setFont(new Font("Arial", Font.PLAIN, 20));
+		g.drawString("Zeitpunkt: " + (int)time, 10, height - 125);
+		g.drawString("Schwerpunktgeschwindigkeit: " + sspV, 10, height - 100);
+		g.drawString("Schwingungsamplitude: " + schwingAmplitude, 10, height - 75);
+		g.drawString("Schwingperiode Masse 1: " + schwingT, 10, height - 50);
+		g.drawString("Schwingperiode Masse 2: " + schwingT2, 10, height - 25);
 
-		// zeichnen
+		// zeichne Massen, Schwerpunkt und Feder
 		g.setColor(Color.red);
 		g.fillRect((int)x1t, 200, 50, 50);
 		g.setColor(Color.blue);
@@ -265,8 +246,8 @@ class _6_YourOwnAnimationPanel extends JPanel {
 		g.fillOval((int)x1t + 20, 220, 10, 10);
 		g.fillOval((int)x2t +20, 220, 10, 10);
 
+		// Falls das Programm Werte ausrechnet, die physikalisch nicht korrekt sind, wird das programm abgebrochen.
 		double abbruchbedingung = l0 - Math.sqrt(a*a + b*b);
-		//System.out.println(abbruchbedingung);
 		if (abbruchbedingung < 50){
 			g.setColor(Color.red);
 			g.setFont(new Font("Arial", Font.PLAIN, 50));
@@ -274,14 +255,6 @@ class _6_YourOwnAnimationPanel extends JPanel {
 			g.drawString("da eine Kollision,", 100, 200);
 			g.drawString("der beiden Massen stattfindet!!!", 100, 300);
 		}
-		
-		g.setColor(Color.blue);
-		g.setFont(new Font("Arial", Font.PLAIN, 20));
-		g.drawString("Zeitpunkt: " + (int)time, 10, height - 125);
-		g.drawString("Schwerpunktgeschwindigkeit: " + sspV, 10, height - 100);
-		g.drawString("Schwingungsamplitude: " + schwingAmplitude, 10, height - 75);
-		g.drawString("Schwingperiode Masse 1: " + schwingT, 10, height - 50);
-		g.drawString("Schwingperiode Masse 2: " + schwingT2, 10, height - 25);
 
 		// Weg Zeit Diagramm
 		g.setColor(Color.black);
